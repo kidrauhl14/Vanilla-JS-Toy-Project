@@ -46,13 +46,31 @@
     });
   };
 
+  /* fetch(API_URL)는 제공된 URL에 네트워크 요청을 보냅니다. 
+  이 함수는 Promise(=요청의 응답)를 반환합니다. 
+  await 키워드는 이 Promise가 해결될 때까지 함수의 실행을 일시 중단합니다.*/
+
+  /*이 함수는 제공된 페이지 번호와 한 페이지당 항목 수에 따라 
+    JSONPlaceholder API라는 테스트용 REST API를 통해 포스트 목록을 비동기적으로 가져오는 역할을 합니다. 
+    만약 API 요청이 실패하면 에러를 던지고, 성공하면 가져온 데이터를 반환합니다. */
   const getPosts = async (page, limit) => {
+    /*page: API에서 가져올 페이지 번호, limit: 페이지 당 포스트의 수  */
+
+    /*API_URL: 실제로 API 요청을 보낼 주소를 저장하는 상수. 
+    주소는 backtick(``)으로 묶은 템플릿 문자열로 작성, ${page}와 ${limit}은 해당 변수의 값을 URL에 삽입합니다. */
     const API_URL = `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=${limit}`;
     const response = await fetch(API_URL);
 
+    /*응답(Response) 객체의 ok 속성은 
+      HTTP 상태 코드가 성공을 나타내는지(즉, 200-299 범위에 있는지) 확인합니다. 
+      만약 ok가 false라면, 에러가 발생한 것으로 간주하고 사용자 정의 에러를 던집니다(throw). */
     if (!response.ok) {
       throw new Error("에러가 발생했습니다.");
     }
+
+    /*response.json()은 응답 본문을 JSON 형태로 파싱하는 메서드입니다. 
+    이 메서드 역시 Promise를 반환하므로, await를 사용하여 Promise가 해결될 때까지 기다립니다. 
+    이 Promise가 해결되면 파싱된 JSON 데이터가 반환됩니다. */
     return await response.json();
   };
 
