@@ -21,18 +21,36 @@
 
 
   /*초기화 담당. 이 함수가 호출되면, 이벤트 리스너들이 DOM 요소에 바인딩됩니다. 
-  검색창과 목록 아이템들에 이벤트 리스너들이 설정됩니다. */
+  검색창과 목록 아이템들에 이벤트 리스너들이 등록됩니다. */
+  //이 함수는 페이지가 로드될 때 한 번 호출되며, 이를 통해 사용자와 상호작용하기 위한 이벤트 리스너들이 설정됩니다.
   const init = () => {
+    /*검색 입력 창($search)에서 키를 눌렀다 놓았을 때(keyup 이벤트), search 함수를 호출. 
+    (사용자가 검색어를 입력하는 동안, 실시간으로 검색 결과를 필터링하기 위함) */
     $search.addEventListener('keyup',search)
+    /*검색 버튼($searchButton)을 클릭하면 search 함수를 호출.
+    검색 버튼을 눌렀을 때 검색 결과를 필터링하는 기능*/
     $searchButton.addEventListener('click', search)
+
+    /*$list에 이벤트리스너 추가!
+    각 목록 요소 내의 picture 요소에 대해 
+    mouseover 이벤트와 mouseout 이벤트에 대한 리스너 등록. 
+    mouseover 이벤트는 마우스가 요소 위로 올라갔을 때 발생하고, 
+    mouseout 이벤트는 마우스가 요소 밖으로 나갔을 때 발생합니다. 
+    각각 onMouseOver와 onMouseOut 함수가 호출됩니다. */
     for(let index = 0; index < $list.length; index++){
       const $target = $list[index].querySelector('picture')
       $target.addEventListener('mouseover', onMouseOver)
       $target.addEventListener('mouseout', onMouseOut)
     }
+
+    /*$list에 이벤트리스너 추가
+    각 목록 요소에 클릭 이벤트 리스너를 추가하여 hashChange 함수를 호출 */
     for(let index = 0; index < $list.length; index++){
       $list[index].addEventListener('click', hashChange)
     }
+    /*[페이지 내비게이션 제어] 주소창의 해시(# 뒤의 부분)가 변경될 때 실행될 콜백 함수를 등록. 
+    이 콜백 내에서는 주소의 해시 부분에 'view' 문자열이 포함되어 있는지 확인하고, 
+    포함되어 있으면 getViewPage() 함수를 호출하고, 그렇지 않으면 getListPage() 함수를 호출.  */
     window.addEventListener('hashchange', () => {
       const isView = -1 < window.location.hash.indexOf('view')
       if (isView) {
@@ -41,6 +59,7 @@
         getListPage()
       }
     })
+    /*viewPageEvent 함수를 호출하여, 비디오 플레이어와 관련된 이벤트 리스너들을 추가 */
     viewPageEvent()
   };
 
@@ -111,24 +130,33 @@
   /*뷰 페이지에서 발생하는 이벤트들을 처리.
   비디오 플레이어의 컨트롤들과 관련된 이벤트 리스너들이 설정됩니다 */
   const viewPageEvent = () => {
-    $volume.addEventListener('change', (e) => {
+    /*볼륨 슬라이더의 값이 변경되면, 플레이어의 볼륨을 해당 값으로 설정 */
+    $volume.addEventListener('change', (e) => { 
       $player.volume = e.target.value
     })
+    /*재생되는 동안 timeupdate 이벤트가 발생하면, setProgress 함수를 호출하여 진행 바를 업데이트 */
     $player.addEventListener('timeupdate', setProgress)
+    /*비디오가 재생 상태로 변경되면, 재생 버튼의 텍스트를 "pause"로 변경 */
     $player.addEventListener('play', buttonChange($btnPlay, 'pause'))
+    /*비디오가 일시 정지 상태로 변경되면, 재생 버튼의 텍스트를 "play"로 변경 */
     $player.addEventListener('pause', buttonChange($btnPlay, 'play'))
+    /*볼륨이 변경되면, 음소거 버튼의 텍스트를 "unmute" 또는 "mute"로 변경 */
     $player.addEventListener('volumechange', () => {
-      $player.muted
-        ? buttonChange($btnMute, 'unmute')
-        : buttonChange($btnMute, 'mute')
+      $player.muted ? buttonChange($btnMute, 'unmute') : buttonChange($btnMute, 'mute')
     })
+    /*비디오가 끝나면, 비디오를 일시 정지 */
     $player.addEventListener('ended', $player.pause())
+    /*진행 바를 클릭하면, getCurrent 함수를 호출하여 현재 시간을 설정 */
     $progress.addEventListener('click', getCurrent)
-
+    /*재생 버튼을 클릭하면, playVideo 함수를 호출하여 비디오를 재생하거나 일시 정지 */
     $btnPlay.addEventListener('click', playVideo)
+    /*다시 재생 버튼을 클릭하면, replayVideo 함수를 호출하여 비디오를 처음부터 재생 */
     $btnReplay.addEventListener('click', replayVideo)
+    /*정지 버튼을 클릭하면, stopVideo 함수를 호출하여 비디오를 정지 */
     $btnStop.addEventListener('click', stopVideo)
+    /*mute 함수를 호출하여 비디오의 소리를 끄거나 켬 */
     $btnMute.addEventListener('click', mute)
+    /*전체 화면 버튼을 클릭하면, fullScreen 함수를 호출하여 비디오를 전체 화면으로 전환 */
     $fullScreen.addEventListener('click', fullScreen)
   };
 
